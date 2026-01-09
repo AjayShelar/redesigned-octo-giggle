@@ -1,0 +1,22 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual env
+.venv/
+
+# Django
+*.sqlite3
+
+# Env files (secrets)
+.env
+.env.*
+.envrc
+
+# Local secrets overrides
+env/*.secret.env
+
+# OS
+.DS_Store

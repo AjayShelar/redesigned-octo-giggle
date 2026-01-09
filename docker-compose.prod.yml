@@ -1,0 +1,45 @@
+version: "3.9"
+
+services:
+  api:
+    env_file:
+      - ./env/prod.base.env
+      - ./env/prod.api.env
+    command: gunicorn core.wsgi:application --bind 0.0.0.0:8000
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+
+  admin:
+    env_file:
+      - ./env/prod.base.env
+      - ./env/prod.admin.env
+    command: gunicorn core.wsgi:application --bind 0.0.0.0:8001
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+
+  db:
+    env_file:
+      - ./env/prod.base.env
+      - ./env/prod.db.env
+    ports:
+      - "5434:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  migrate:
+    build:
+      context: ./backend
+    command: python manage.py migrate
+    env_file:
+      - ./env/prod.base.env
+      - ./env/prod.api.env
+    volumes:
+      - ./backend:/app
+    depends_on:
+      db:
+        condition: service_healthy
