@@ -34,7 +34,7 @@ services:
   migrate:
     build:
       context: ./backend
-    command: python manage.py migrate
+    command: sh -c "python manage.py migrate && if [ \"${RUN_TESTS}\" = \"1\" ]; then python manage.py test; fi"
     env_file:
       - ./env/prod.base.env
       - ./env/prod.api.env
